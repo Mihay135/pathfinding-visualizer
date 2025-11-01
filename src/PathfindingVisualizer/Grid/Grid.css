@@ -22,3 +22,122 @@
   box-sizing: border-box;
   overflow: hidden;
 }
+/* styles/Grid.css */
+
+.no-path-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(44, 62, 80, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  pointer-events: auto;
+  backdrop-filter: blur(4px);
+}
+
+.no-path-message {
+  background: #34495e;
+  color: #ecf0f1;
+  padding: 18px 36px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1.4rem;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border: 1px solid #1a2530;
+  animation: popIn 0.35s ease-out;
+  user-select: none;
+}
+
+.no-path-message::before {
+  content: "Warning";
+  display: block;
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+  opacity: 0.8;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.7); opacity: 0; }
+  70% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* styles/Grid.css */
+
+/* SMALL, CLEAN POPUP */
+.no-path-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(44, 62, 80, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  pointer-events: auto;
+  backdrop-filter: blur(4px);
+}
+
+.no-path-message {
+  background: #34495e;
+  color: #ecf0f1;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  border: 1px solid #1a2530;
+  animation: popIn 0.3s ease-out;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 280px;
+}
+
+.no-path-title {
+  font-size: 1.3rem;
+  opacity: 0.9;
+}
+
+.no-path-close {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.no-path-close:hover {
+  background: #c0392b;
+}
+
+/* Dark mode */
+body.dark-mode .no-path-overlay {
+  background: rgba(26, 26, 26, 0.95);
+}
+
+body.dark-mode .no-path-message {
+  background: #2c3e50;
+  border: 1px solid #1a1a1a;
+  color: #bdc3c7;
+}
+
+body.dark-mode .no-path-close {
+  background: #c0392b;
+}
+
+body.dark-mode .no-path-close:hover {
+  background: #a93226;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}

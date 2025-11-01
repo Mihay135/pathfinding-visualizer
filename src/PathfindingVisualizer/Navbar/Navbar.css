@@ -1,31 +1,80 @@
 /* styles/Navbar.css */
 .navbar {
-  height: 50px;
+  height: 60px;              /* Fixed height */
+  min-height: 60px;          /* Never shrink */
   background: #2c3e50;
   display: flex;
+  justify-content: space-between;
   align-items: center;
   padding: 0 16px;
-  gap: 12px;
   border-bottom: 2px solid #1a2530;
   user-select: none;
+  flex-shrink: 0;            /* Prevent shrink */
+  box-sizing: border-box;
 }
 
-.nav-btn {
-  padding: 8px 16px;
+.darkmode-label {
+  color: #ecf0f1;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+.darkmode-label input {
+  cursor: pointer;
+}
+
+/* Rest unchanged */
+
+.mode-group, .control-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.nav-btn, .algo-select, .clear-btn, .run-btn, .maze-btn {
+  padding: 8px 12px;
   background: #34495e;
   color: #ecf0f1;
   border: none;
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.nav-btn:hover {
-  background: #4a6572;
 }
 
 .nav-btn.active {
-  background: #e74c3c;
+  background: #e74c3c !important;     /* RED when active */
   box-shadow: 0 0 8px rgba(231, 76, 60, 0.5);
+}
+
+.algo-select { width: 100px; }
+.run-btn { background: #27ae60; }
+.run-btn:hover { background: #2ecc71; }
+.clear-btn { background: #e74c3c; }
+.clear-btn:hover { background: #c0392b; }
+.maze-btn { background: #9b59b6; }
+.maze-btn:hover { background: #8e44ad; }
+
+.speed-label {
+  color: #ecf0f1;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.speed-label input { width: 80px; }
+.speed-label span { min-width: 40px; font-weight: bold; }
+
+/* styles/Navbar.css */
+.animate-label {
+  color: #ecf0f1;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  user-select: none;
+}
+.animate-label input {
+  cursor: pointer;
 }

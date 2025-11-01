@@ -2,10 +2,17 @@
 import { memo } from 'react';
 import './Cell.css';
 
-function Cell({ id, isWall, isStart, isGoal, onActivate }) {
+function Cell({ id, isWall, isStart, isGoal, isVisited, isPath, isCurrent, onActivate }) {
   return (
     <div
-      className={`cell ${isWall ? 'wall' : ''} ${isStart ? 'start' : ''} ${isGoal ? 'goal' : ''}`}
+      className={`cell
+        ${isWall ? 'wall' : ''}
+        ${isStart ? 'start' : ''}
+        ${isGoal ? 'goal' : ''}
+        ${isVisited ? 'visited' : ''}
+        ${isPath ? 'path' : ''}
+        ${isCurrent ? 'current' : ''}
+      `}
       data-id={id}
       role="gridcell"
       aria-label={`Cell ${id}`}
