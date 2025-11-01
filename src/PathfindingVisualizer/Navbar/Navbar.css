@@ -1,64 +1,93 @@
 /* styles/Navbar.css */
 .navbar {
-  height: 60px;              /* Fixed height */
-  min-height: 60px;          /* Never shrink */
+  height: 70px;
+  min-height: 70px;
   background: #2c3e50;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   padding: 0 16px;
   border-bottom: 2px solid #1a2530;
   user-select: none;
-  flex-shrink: 0;            /* Prevent shrink */
-  box-sizing: border-box;
+  flex-shrink: 0;
+  gap: 20px;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
-.darkmode-label {
+/* SECTION CONTAINER */
+.nav-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* SECTION TITLE – CUTS THROUGH BORDER */
+.section-title {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #2c3e50;
+  padding: 0 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
   color: #ecf0f1;
-  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* SECTION CONTENT – BOX WITH BORDER */
+.section-content {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  user-select: none;
-}
-.darkmode-label input {
-  cursor: pointer;
-}
-
-/* Rest unchanged */
-
-.mode-group, .control-group {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.nav-btn, .algo-select, .clear-btn, .run-btn, .maze-btn {
-  padding: 8px 12px;
+  gap: 8px;
+  padding: 16px 12px 12px;
+  border: 2px solid #1a2530;
+  border-radius: 12px;
   background: #34495e;
-  color: #ecf0f1;
+  min-width: fit-content;
+  align-items: center;
+}
+
+/* BUTTONS */
+.nav-btn, .weight-btn, .algo-select, .maze-btn, .clear-btn, .run-btn {
+  padding: 8px 12px;
+  background: #95a5a6;
+  color: white;
   border: none;
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
+  font-size: 0.9rem;
+  min-width: 40px;
 }
 
-.nav-btn.active {
-  background: #e74c3c !important;     /* RED when active */
-  box-shadow: 0 0 8px rgba(231, 76, 60, 0.5);
+.nav-btn.active, .weight-btn.active {
+  background: #e67e22 !important;
+  box-shadow: 0 0 8px rgba(230, 126, 34, 0.6);
 }
 
-.algo-select { width: 100px; }
-.run-btn { background: #27ae60; }
-.run-btn:hover { background: #2ecc71; }
-.clear-btn { background: #e74c3c; }
-.clear-btn:hover { background: #c0392b; }
+/* WEIGHT BUTTONS */
+.weight-btn:nth-child(1) { background: #27ae60; }
+.weight-btn:nth-child(2) { background: #f39c12; }
+.weight-btn:nth-child(3) { background: #e67e22; }
+.weight-btn:nth-child(4) { background: #c0392b; }
+
+/* CONTROLS */
 .maze-btn { background: #9b59b6; }
 .maze-btn:hover { background: #8e44ad; }
+.clear-btn { background: #e74c3c; }
+.clear-btn:hover { background: #c0392b; }
+.run-btn { background: #27ae60; }
+.run-btn:hover { background: #2ecc71; }
 
-.speed-label {
+/* OPTIONS */
+.algo-select { width: 100px; }
+.speed-label, .animate-label, .darkmode-label {
   color: #ecf0f1;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -66,15 +95,38 @@
 .speed-label input { width: 80px; }
 .speed-label span { min-width: 40px; font-weight: bold; }
 
-/* styles/Navbar.css */
-.animate-label {
-  color: #ecf0f1;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  user-select: none;
-}
-.animate-label input {
+.animate-label input,
+.darkmode-label input {
   cursor: pointer;
+}
+
+/* DARK MODE */
+body.dark-mode .navbar {
+  background: #1a1a1a;
+  border-bottom: 2px solid #000;
+}
+
+body.dark-mode .section-title {
+  background: #1a1a1a;
+  color: #bdc3c7;
+}
+
+body.dark-mode .section-content {
+  background: #2c3e50;
+  border-color: #000;
+}
+
+body.dark-mode .nav-btn,
+body.dark-mode .weight-btn,
+body.dark-mode .algo-select,
+body.dark-mode .maze-btn,
+body.dark-mode .clear-btn,
+body.dark-mode .run-btn {
+  background: #34495e;
+  color: #ecf0f1;
+}
+
+body.dark-mode .nav-btn.active,
+body.dark-mode .weight-btn.active {
+  background: #e67e22 !important;
 }

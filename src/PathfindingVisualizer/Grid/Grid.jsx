@@ -6,8 +6,8 @@ import { astar } from '../../Algorithms/Astar';
 import { dfs } from '../../Algorithms/DFS.js';
 import './Grid.css';
 
-
 const DEBOUNCE_MS = 50;
+const WEIGHT_COLORS = { 1: '#27ae60', 5: '#f39c12', 10: '#e67e22', 20: '#c0392b' };
 
 export default function Grid({ mode, algorithm, speed }) {
   const wrapperRef = useRef(null);
@@ -22,6 +22,7 @@ export default function Grid({ mode, algorithm, speed }) {
   const [gap, setGap] = useState(0);
 
   const [wallCells, setWallCells] = useState(new Set());
+  const [weightCells, setWeightCells] = useState(new Map()); // id → weight
   const [startCell, setStartCell] = useState(null);
   const [goalCell, setGoalCell] = useState(null);
 
@@ -29,7 +30,7 @@ export default function Grid({ mode, algorithm, speed }) {
   const [pathCells, setPathCells] = useState(new Set());
   const [currentCell, setCurrentCell] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
-  const [noPath, setNoPath] = useState(false); // ← NEW
+  const [noPath, setNoPath] = useState(false);
 
   const css = useMemo(() => {
     const s = getComputedStyle(document.documentElement);
@@ -63,6 +64,14 @@ export default function Grid({ mode, algorithm, speed }) {
         const { cols, rows, size } = calculate();
         setCols(cols); setRows(rows); setCellSize(size); setGap(css.gap);
         setWallCells(prev => filterOutOfBounds(prev, rows, cols));
+        setWeightCells(prev => {
+          const next = new Map();
+          for (const [id, w] of prev) {
+            const [r, c] = id.split('-').map(Number);
+            if (r < rows && c < cols) next.set(id, w);
+          }
+          return next;
+        });
         if (startCell && !isInBounds(startCell, rows, cols)) setStartCell(null);
         if (goalCell && !isInBounds(goalCell, rows, cols)) setGoalCell(null);
       });
@@ -91,27 +100,50 @@ export default function Grid({ mode, algorithm, speed }) {
     if (e.type === 'mousedown' || e.type === 'touchstart') isDragging.current = true;
     if (!isDragging.current) return;
 
-    if (mode === 'wall') setWallCells(prev => new Set(prev).add(id));
+    if (mode === 'wall') {
+      setWallCells(prev => new Set(prev).add(id));
+      setWeightCells(prev => { const n = new Map(prev); n.delete(id); return n; });
+    }
+    else if (mode.startsWith('weight-')) {
+      const weight = parseInt(mode.split('-')[1]);
+      setWeightCells(prev => new Map(prev).set(id, weight));
+      setWallCells(prev => { const n = new Set(prev); n.delete(id); return n; });
+    }
     else if (mode === 'erase') {
       setWallCells(prev => { const n = new Set(prev); n.delete(id); return n; });
+      setWeightCells(prev => { const n = new Map(prev); n.delete(id); return n; });
       if (startCell === id) setStartCell(null);
       if (goalCell === id) setGoalCell(null);
     }
-    else if (mode === 'start') { setStartCell(id); setWallCells(prev => { const n = new Set(prev); n.delete(id); return n; }); }
-    else if (mode === 'goal') { setGoalCell(id); setWallCells(prev => { const n = new Set(prev); n.delete(id); return n; }); }
+    else if (mode === 'start') {
+      setStartCell(id);
+      setWallCells(prev => { const n = new Set(prev); n.delete(id); return n; });
+      setWeightCells(prev => { const n = new Map(prev); n.delete(id); return n; });
+    }
+    else if (mode === 'goal') {
+      setGoalCell(id);
+      setWallCells(prev => { const n = new Set(prev); n.delete(id); return n; });
+      setWeightCells(prev => { const n = new Map(prev); n.delete(id); return n; });
+    }
   }, [mode, isRunning, startCell, goalCell]);
 
-  // --- RUN ---
-   const run = useCallback(() => {
+  // --- RUN (WEIGHTS + SCALED ANIMATION) ---
+  const run = useCallback(() => {
     if (!startCell || !goalCell || isRunning) return;
     setIsRunning(true);
     setVisitedCells(new Set());
     setPathCells(new Set());
     setCurrentCell(null);
-    setNoPath(false); // ← Reset
+    setNoPath(false);
 
     const grid = Array.from({ length: rows }, (_, r) =>
-      Array.from({ length: cols }, (_, c) => ({ isWall: wallCells.has(`${r}-${c}`) }))
+      Array.from({ length: cols }, (_, c) => {
+        const id = `${r}-${c}`;
+        return {
+          isWall: wallCells.has(id),
+          weight: weightCells.get(id) || 1
+        };
+      })
     );
 
     const [sr, sc] = startCell.split('-').map(Number);
@@ -126,7 +158,6 @@ export default function Grid({ mode, algorithm, speed }) {
         clearInterval(intervalRef.current);
         setCurrentCell(null);
 
-        // ONLY NOW check if path exists
         if (path.length > 0) {
           let j = 0;
           const pathInt = setInterval(() => {
@@ -136,11 +167,14 @@ export default function Grid({ mode, algorithm, speed }) {
               return;
             }
             const cell = path[j];
-            setPathCells(prev => new Set(prev).add(`${cell.row}-${cell.col}`));
+            const id = `${cell.row}-${cell.col}`;
+            const cellWeight = grid[cell.row][cell.col].weight;
+            const delay = speed * cellWeight;
+            setPathCells(prev => new Set(prev).add(id));
             j++;
           }, speed);
         } else {
-          setNoPath(true);           // ← Only after full search
+          setNoPath(true);
           setIsRunning(false);
         }
         return;
@@ -148,11 +182,15 @@ export default function Grid({ mode, algorithm, speed }) {
 
       const cell = visitedInOrder[i];
       const id = `${cell.row}-${cell.col}`;
+      const cellWeight = grid[cell.row][cell.col].weight;
+      const visitDelay = speed * 0.7 * cellWeight;
+
       setCurrentCell(id);
-      setTimeout(() => setVisitedCells(prev => new Set(prev).add(id)), speed * 0.7);
+      setTimeout(() => setVisitedCells(prev => new Set(prev).add(id)), visitDelay);
       i++;
     }, speed);
-  }, [rows, cols, startCell, goalCell, wallCells, algorithm, speed, isRunning]);
+  }, [rows, cols, startCell, goalCell, wallCells, weightCells, algorithm, speed, isRunning]);
+
   // --- CLEAR ---
   const clear = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -162,11 +200,12 @@ export default function Grid({ mode, algorithm, speed }) {
     setCurrentCell(null);
     setNoPath(false);
     setWallCells(new Set());
+    setWeightCells(new Map());
     setStartCell(null);
     setGoalCell(null);
   }, []);
 
-  // --- MAZE GENERATOR (ANIMATED OR INSTANT) ---
+  // --- MAZE GENERATOR (UNCHANGED) ---
   const generateMaze = useCallback((e) => {
     const animate = e.detail?.animate ?? true;
     if (isRunning || rows < 7 || cols < 7) return;
@@ -229,20 +268,15 @@ export default function Grid({ mode, algorithm, speed }) {
           finalWalls.add(wall.id);
         }
       }
-      // Add outer walls
       for (let r = 0; r < rows; r++) {
-        finalWalls.add(`${r}-0`);
-        finalWalls.add(`${r}-${cols-1}`);
+        finalWalls.add(`${r}-0`); finalWalls.add(`${r}-${cols-1}`);
       }
       for (let c = 0; c < cols; c++) {
-        finalWalls.add(`0-${c}`);
-        finalWalls.add(`${rows-1}-${c}`);
+        finalWalls.add(`0-${c}`); finalWalls.add(`${rows-1}-${c}`);
       }
-      finalWalls.delete('1-1');
-      finalWalls.delete(`${rows-2}-${cols-2}`);
+      finalWalls.delete('1-1'); finalWalls.delete(`${rows-2}-${cols-2}`);
       setWallCells(finalWalls);
-      setStartCell('1-1');
-      setGoalCell(`${rows-2}-${cols-2}`);
+      setStartCell('1-1'); setGoalCell(`${rows-2}-${cols-2}`);
       return;
     }
 
@@ -250,18 +284,14 @@ export default function Grid({ mode, algorithm, speed }) {
     const animateBuild = () => {
       if (index >= walls.length) {
         for (let r = 0; r < rows; r++) {
-          finalWalls.add(`${r}-0`);
-          finalWalls.add(`${r}-${cols-1}`);
+          finalWalls.add(`${r}-0`); finalWalls.add(`${r}-${cols-1}`);
         }
         for (let c = 0; c < cols; c++) {
-          finalWalls.add(`0-${c}`);
-          finalWalls.add(`${rows-1}-${c}`);
+          finalWalls.add(`0-${c}`); finalWalls.add(`${rows-1}-${c}`);
         }
-        finalWalls.delete('1-1');
-        finalWalls.delete(`${rows-2}-${cols-2}`);
+        finalWalls.delete('1-1'); finalWalls.delete(`${rows-2}-${cols-2}`);
         setWallCells(finalWalls);
-        setStartCell('1-1');
-        setGoalCell(`${rows-2}-${cols-2}`);
+        setStartCell('1-1'); setGoalCell(`${rows-2}-${cols-2}`);
         return;
       }
 
@@ -301,11 +331,13 @@ export default function Grid({ mode, algorithm, speed }) {
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const id = `${r}-${c}`;
+        const weight = weightCells.get(id);
         arr.push(
           <Cell
             key={id}
             id={id}
             isWall={wallCells.has(id)}
+            weight={weight}
             isStart={startCell === id}
             isGoal={goalCell === id}
             isVisited={visitedCells.has(id)}
@@ -317,21 +349,20 @@ export default function Grid({ mode, algorithm, speed }) {
       }
     }
     return arr;
-  }, [rows, cols, wallCells, startCell, goalCell, visitedCells, pathCells, currentCell, handleCellClick]);
+  }, [rows, cols, wallCells, weightCells, startCell, goalCell, visitedCells, pathCells, currentCell, handleCellClick]);
 
   return (
-    
     <div ref={wrapperRef} className="grid-wrapper">
-        {noPath && (
-            <div className="no-path-overlay" onClick={() => setNoPath(false)}>
-                <div className="no-path-message" onClick={(e) => e.stopPropagation()}>
-                <div className="no-path-title">Warning: No Path Found!</div>
-                <button className="no-path-close" onClick={() => setNoPath(false)}>
-                    Close
-                </button>
-                </div>
-            </div>
-        )}
+      {noPath && (
+        <div className="no-path-overlay" onClick={() => setNoPath(false)}>
+          <div className="no-path-message" onClick={(e) => e.stopPropagation()}>
+            <div className="no-path-title">Warning No Path Found</div>
+            <button className="no-path-close" onClick={() => setNoPath(false)}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
       <div
         ref={containerRef}
         className="grid-container"

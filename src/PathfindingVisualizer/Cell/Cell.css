@@ -1,23 +1,35 @@
 /* styles/Cell.css */
 .cell {
   border: 1px solid hsla(0, 100%, 94%, 0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: monospace;
-  font-size: 0.75rem;
-  user-select: none;
   background-color: hsl(223, 100%, 87%);
-  transition: background-color 0.15s ease;
-  border-radius: 2px;
   color: #333;
   position: relative;
-  z-index: 1;
 }
 
-.cell.wall { background-color: #ff6b6b !important; color: white; font-weight: bold; }
-.cell.start { background-color: #2ecc71 !important; color: white; font-weight: bold; }
-.cell.goal { background-color: #f1c40f !important; color: #2c3e50; font-weight: bold; }
+body.dark-mode .cell {
+  border: 1px solid hsla(0, 0%, 20%, 0.9);
+  background-color: hsl(223, 20%, 20%);
+  color: #ecf0f1;
+}
+
+/* Weight colors */
+:root {
+  --weight-color-1: #36d779;
+  --weight-color-5: #f39c12;
+  --weight-color-10: #e67e22;
+  --weight-color-20: #ff6b6b;
+}
+
+.cell::after {
+  content: attr(data-weight);
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 0 4px black;
+}
 
 .cell.visited {
   animation: pop 0.3s ease-out;
@@ -56,21 +68,9 @@
 
 .cell:hover { filter: brightness(1.1); }
 
-/* styles/Cell.css */
-.cell {
-  border: 1px solid hsla(0, 100%, 94%, 0.9);
-  background-color: hsl(223, 100%, 87%);
-  color: #333;
-}
 
-body.dark-mode .cell {
-  border: 1px solid hsla(0, 0%, 20%, 0.9);
-  background-color: hsl(223, 20%, 20%);
-  color: #ecf0f1;
-}
-
-.cell.wall { background-color: #ff6b6b !important; color: white; }
-.cell.start { background-color: #2ecc71 !important; color: white; }
+.cell.wall { background-color: #c0392b !important; color: white; }
+.cell.start { background-color: #269454 !important; color: white; }
 .cell.goal { background-color: #f1c40f !important; color: #2c3e50; }
 
 .cell.visited { background-color: #a8e6cf !important; }

@@ -1,4 +1,4 @@
-// Algorithms/dijkstra.js
+// dijkstra.js
 export function dijkstra(grid, start, goal) {
   const rows = grid.length, cols = grid[0].length;
   const dist = Array.from({ length: rows }, () => Array(cols).fill(Infinity));
@@ -20,7 +20,8 @@ export function dijkstra(grid, start, goal) {
     for (const [dr, dc] of [[-1,0],[1,0],[0,-1],[0,1]]) {
       const nr = r + dr, nc = c + dc;
       if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && !grid[nr][nc].isWall && !visited[nr][nc]) {
-        const nd = d + 1;
+        const weight = grid[nr][nc].weight || 1;
+        const nd = d + weight;
         if (nd < dist[nr][nc]) {
           dist[nr][nc] = nd;
           prev[nr][nc] = { row: r, col: c };

@@ -1,6 +1,6 @@
-// Algorithms/astar.js
+// astar.js
 function heuristic(a, b) {
-  return Math.abs(a.row - b.row) + Math.abs(a.col - b.col); // Manhattan
+  return Math.abs(a.row - b.row) + Math.abs(a.col - b.col);
 }
 
 export function astar(grid, start, goal) {
@@ -15,7 +15,6 @@ export function astar(grid, start, goal) {
     openSet.sort((a, b) => a.f - b.f);
     const current = openSet.shift();
     const { row, col } = current;
-    const id = `${row}-${col}`;
 
     if (row === goal.row && col === goal.col) {
       const path = [];
@@ -32,10 +31,10 @@ export function astar(grid, start, goal) {
     for (const [dr, dc] of [[-1,0],[1,0],[0,-1],[0,1]]) {
       const nr = row + dr, nc = col + dc;
       if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && !grid[nr][nc].isWall) {
-        const nid = `${nr}-${nc}`;
-        const tentativeG = gScore[row][col] + 1;
+        const weight = grid[nr][nc].weight || 1;
+        const tentativeG = gScore[row][col] + weight;
         if (tentativeG < gScore[nr][nc]) {
-          cameFrom[nid] = current;
+          cameFrom[`${nr}-${nc}`] = current;
           gScore[nr][nc] = tentativeG;
           const h = heuristic({ row: nr, col: nc }, goal);
           const f = tentativeG + h;
