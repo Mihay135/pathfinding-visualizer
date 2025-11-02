@@ -1,4 +1,4 @@
-// dijkstra.js
+// Algorithms/Dijkstra.js
 export function dijkstra(grid, start, goal) {
   const rows = grid.length, cols = grid[0].length;
   const dist = Array.from({ length: rows }, () => Array(cols).fill(Infinity));

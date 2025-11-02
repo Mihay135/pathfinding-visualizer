@@ -2,7 +2,7 @@
 import { memo } from 'react';
 import './Cell.css';
 
-export default function Cell({ id, isWall, weight, isStart, isGoal, isVisited, isPath, isCurrent, onActivate }) {
+export default memo(function Cell({ id, isWall, weight, isStart, isGoal, isVisited, isPath, isCurrent, onActivate }) {
   return (
     <div
       className={`cell ${isWall ? 'wall' : ''} ${isStart ? 'start' : ''} ${isGoal ? 'goal' : ''} ${isVisited ? 'visited' : ''} ${isPath ? 'path' : ''} ${isCurrent ? 'current' : ''}`}
@@ -13,7 +13,7 @@ export default function Cell({ id, isWall, weight, isStart, isGoal, isVisited, i
       onTouchStart={onActivate}
       onTouchMove={onActivate}
     >
-      {weight && weight > 1 && ! {weight}}
+      {weight > 1 && weight}
     </div>
   );
-}
+});

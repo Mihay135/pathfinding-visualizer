@@ -7,7 +7,6 @@ import { dfs } from '../../Algorithms/DFS.js';
 import './Grid.css';
 
 const DEBOUNCE_MS = 50;
-const WEIGHT_COLORS = { 1: '#27ae60', 5: '#f39c12', 10: '#e67e22', 20: '#c0392b' };
 
 export default function Grid({ mode, algorithm, speed }) {
   const wrapperRef = useRef(null);
@@ -22,7 +21,7 @@ export default function Grid({ mode, algorithm, speed }) {
   const [gap, setGap] = useState(0);
 
   const [wallCells, setWallCells] = useState(new Set());
-  const [weightCells, setWeightCells] = useState(new Map()); // id → weight
+  const [weightCells, setWeightCells] = useState(new Map());
   const [startCell, setStartCell] = useState(null);
   const [goalCell, setGoalCell] = useState(null);
 
@@ -127,7 +126,6 @@ export default function Grid({ mode, algorithm, speed }) {
     }
   }, [mode, isRunning, startCell, goalCell]);
 
-  // --- RUN (WEIGHTS + SCALED ANIMATION) ---
   const run = useCallback(() => {
     if (!startCell || !goalCell || isRunning) return;
     setIsRunning(true);
@@ -139,10 +137,7 @@ export default function Grid({ mode, algorithm, speed }) {
     const grid = Array.from({ length: rows }, (_, r) =>
       Array.from({ length: cols }, (_, c) => {
         const id = `${r}-${c}`;
-        return {
-          isWall: wallCells.has(id),
-          weight: weightCells.get(id) || 1
-        };
+        return { isWall: wallCells.has(id), weight: weightCells.get(id) || 1 };
       })
     );
 
@@ -157,19 +152,13 @@ export default function Grid({ mode, algorithm, speed }) {
       if (i >= visitedInOrder.length) {
         clearInterval(intervalRef.current);
         setCurrentCell(null);
-
         if (path.length > 0) {
           let j = 0;
           const pathInt = setInterval(() => {
-            if (j >= path.length) {
-              clearInterval(pathInt);
-              setIsRunning(false);
-              return;
-            }
+            if (j >= path.length) { clearInterval(pathInt); setIsRunning(false); return; }
             const cell = path[j];
             const id = `${cell.row}-${cell.col}`;
             const cellWeight = grid[cell.row][cell.col].weight;
-            const delay = speed * cellWeight;
             setPathCells(prev => new Set(prev).add(id));
             j++;
           }, speed);
@@ -181,6 +170,7 @@ export default function Grid({ mode, algorithm, speed }) {
       }
 
       const cell = visitedInOrder[i];
+     
       const id = `${cell.row}-${cell.col}`;
       const cellWeight = grid[cell.row][cell.col].weight;
       const visitDelay = speed * 0.7 * cellWeight;
@@ -191,7 +181,6 @@ export default function Grid({ mode, algorithm, speed }) {
     }, speed);
   }, [rows, cols, startCell, goalCell, wallCells, weightCells, algorithm, speed, isRunning]);
 
-  // --- CLEAR ---
   const clear = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     setIsRunning(false);
@@ -205,7 +194,6 @@ export default function Grid({ mode, algorithm, speed }) {
     setGoalCell(null);
   }, []);
 
-  // --- MAZE GENERATOR (UNCHANGED) ---
   const generateMaze = useCallback((e) => {
     const animate = e.detail?.animate ?? true;
     if (isRunning || rows < 7 || cols < 7) return;
@@ -262,18 +250,11 @@ export default function Grid({ mode, algorithm, speed }) {
     const finalWalls = new Set();
     if (!animate) {
       for (const wall of walls) {
-        if (find(wall.a) !== find(wall.b)) {
-          union(wall.a, wall.b);
-        } else {
-          finalWalls.add(wall.id);
-        }
+        if (find(wall.a) !== find(wall.b)) union(wall.a, wall.b);
+        else finalWalls.add(wall.id);
       }
-      for (let r = 0; r < rows; r++) {
-        finalWalls.add(`${r}-0`); finalWalls.add(`${r}-${cols-1}`);
-      }
-      for (let c = 0; c < cols; c++) {
-        finalWalls.add(`0-${c}`); finalWalls.add(`${rows-1}-${c}`);
-      }
+      for (let r = 0; r < rows; r++) { finalWalls.add(`${r}-0`); finalWalls.add(`${r}-${cols-1}`); }
+      for (let c = 0; c < cols; c++) { finalWalls.add(`0-${c}`); finalWalls.add(`${rows-1}-${c}`); }
       finalWalls.delete('1-1'); finalWalls.delete(`${rows-2}-${cols-2}`);
       setWallCells(finalWalls);
       setStartCell('1-1'); setGoalCell(`${rows-2}-${cols-2}`);
@@ -283,12 +264,8 @@ export default function Grid({ mode, algorithm, speed }) {
     let index = 0;
     const animateBuild = () => {
       if (index >= walls.length) {
-        for (let r = 0; r < rows; r++) {
-          finalWalls.add(`${r}-0`); finalWalls.add(`${r}-${cols-1}`);
-        }
-        for (let c = 0; c < cols; c++) {
-          finalWalls.add(`0-${c}`); finalWalls.add(`${rows-1}-${c}`);
-        }
+        for (let r = 0; r < rows; r++) { finalWalls.add(`${r}-0`); finalWalls.add(`${r}-${cols-1}`); }
+        for (let c = 0; c < cols; c++) { finalWalls.add(`0-${c}`); finalWalls.add(`${rows-1}-${c}`); }
         finalWalls.delete('1-1'); finalWalls.delete(`${rows-2}-${cols-2}`);
         setWallCells(finalWalls);
         setStartCell('1-1'); setGoalCell(`${rows-2}-${cols-2}`);
@@ -296,12 +273,8 @@ export default function Grid({ mode, algorithm, speed }) {
       }
 
       const wall = walls[index++];
-      if (find(wall.a) !== find(wall.b)) {
-        union(wall.a, wall.b);
-      } else {
-        finalWalls.add(wall.id);
-        setWallCells(new Set(finalWalls));
-      }
+      if (find(wall.a) !== find(wall.b)) union(wall.a, wall.b);
+      else { finalWalls.add(wall.id); setWallCells(new Set(finalWalls)); }
 
       setTimeout(animateBuild, Math.max(1, speed / 3));
     };
@@ -355,11 +328,9 @@ export default function Grid({ mode, algorithm, speed }) {
     <div ref={wrapperRef} className="grid-wrapper">
       {noPath && (
         <div className="no-path-overlay" onClick={() => setNoPath(false)}>
-          <div className="no-path-message" onClick={(e) => e.stopPropagation()}>
-            <div className="no-path-title">Warning No Path Found</div>
-            <button className="no-path-close" onClick={() => setNoPath(false)}>
-              Close
-            </button>
+          <div className="no-path-message" onClick={e => e.stopPropagation()}>
+            <div className="no-path-title">No Path Found</div>
+            <button className="no-path-close" onClick={() => setNoPath(false)}>Close</button>
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
-/* styles/PathfindingVisualizer.css */
+/*PathfindingVisualizer.css */
 .pathfinding-visualizer {
   height: 100vh;
   display: flex;
@@ -12,11 +12,7 @@ body.dark-mode {
   color: #ecf0f1;
 }
 
-body.dark-mode .pathfinding-visualizer {
-  background: #1a1a1a;
-}
-
-/* Optional: Dark mode for grid wrapper */
+body.dark-mode .pathfinding-visualizer,
 body.dark-mode .grid-wrapper {
   background: #1a1a1a;
 }

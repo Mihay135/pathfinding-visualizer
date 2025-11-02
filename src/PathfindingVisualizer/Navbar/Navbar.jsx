@@ -15,7 +15,7 @@ export default function Navbar({
     <nav className="navbar">
       {/* PAINTING TOOLS */}
       <div className="nav-section">
-        <div className='section-title-wrapper'>
+        <div className="section-title-wrapper">
           <h3 className="section-title">Painting Tools</h3>
         </div>
         <div className="section-content">
@@ -24,6 +24,12 @@ export default function Navbar({
               key={m}
               className={`nav-btn ${mode === m ? 'active' : ''}`}
               onClick={() => setMode(m)}
+              title={
+                m === 'wall' ? 'Draw walls' :
+                m === 'erase' ? 'Erase cells' :
+                m === 'start' ? 'Set start node' :
+                'Set goal node'
+              }
             >
               {m.charAt(0).toUpperCase() + m.slice(1)}
             </button>
@@ -33,7 +39,7 @@ export default function Navbar({
 
       {/* WEIGHTED BRUSH */}
       <div className="nav-section">
-        <div className='section-title-wrapper'>
+        <div className="section-title-wrapper">
           <h3 className="section-title">Weighted Brush</h3>
         </div>
         <div className="section-content">
@@ -42,6 +48,7 @@ export default function Navbar({
               key={w}
               className={`weight-btn ${mode === `weight-${w}` ? 'active' : ''}`}
               onClick={() => setMode(`weight-${w}`)}
+              title={`Paint weight ${w}${w === 1 ? ' (default path)' : ''}`}
             >
               {w === 1 ? 'Path' : w}
             </button>
@@ -51,29 +58,28 @@ export default function Navbar({
 
       {/* OPTIONS */}
       <div className="nav-section">
-        <div className='section-title-wrapper'>
+        <div className="section-title-wrapper">
           <h3 className="section-title">Options</h3>
         </div>
-        
         <div className="section-content">
-          <select value={algorithm} onChange={e => setAlgorithm(e.target.value)} className="algo-select">
+          <select value={algorithm} onChange={e => setAlgorithm(e.target.value)} className="algo-select" title="Choose pathfinding algorithm">
             <option value="dijkstra">Dijkstra</option>
             <option value="astar">A*</option>
             <option value="dfs">DFS</option>
           </select>
 
-          <label className="speed-label">
+          <label className="speed-label" title="Animation speed in milliseconds">
             Speed:
             <input type="range" min="1" max="100" value={speed} onChange={e => setSpeed(+e.target.value)} />
             <span>{speed}ms</span>
           </label>
 
-          <label className="animate-label">
+          <label className="animate-label" title="Animate maze generation">
             <input type="checkbox" checked={animateMaze} onChange={e => setAnimateMaze(e.target.checked)} />
             Animate Maze
           </label>
 
-          <label className="darkmode-label">
+          <label className="darkmode-label" title="Toggle dark mode">
             <input type="checkbox" checked={darkMode} onChange={e => setDarkMode(e.target.checked)} />
             Dark Mode
           </label>
@@ -82,14 +88,13 @@ export default function Navbar({
 
       {/* CONTROLS */}
       <div className="nav-section">
-        <div className='section-title-wrapper'>
+        <div className="section-title-wrapper">
           <h3 className="section-title">Controls</h3>
         </div>
-        
         <div className="section-content">
-          <button className="maze-btn" onClick={onGenerateMaze}>Generate Maze</button>
-          <button className="clear-btn" onClick={onClear}>Clear</button>
-          <button className="run-btn" onClick={onRun}>Run</button>
+          <button className="maze-btn" onClick={onGenerateMaze} title="Generate random maze">Generate Maze</button>
+          <button className="clear-btn" onClick={onClear} title="Clear all nodes and paths">Clear</button>
+          <button className="run-btn" onClick={onRun} title="Run selected algorithm">Run</button>
         </div>
       </div>
     </nav>

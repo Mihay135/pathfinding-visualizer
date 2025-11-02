@@ -1,4 +1,4 @@
-// Algorithms/dfs.js
+// Algorithms/DFS.js
 export function dfs(grid, start, goal) {
   const rows = grid.length, cols = grid[0].length;
   const visited = Array.from({ length: rows }, () => Array(cols).fill(false));
