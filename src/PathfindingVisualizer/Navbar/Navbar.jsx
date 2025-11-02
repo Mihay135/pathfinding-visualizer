@@ -13,10 +13,10 @@ export default function Navbar({
 
   return (
     <nav className="navbar">
-      {/* PAINTING TOOLS */}
+      {/* TOOLS */}
       <div className="nav-section">
-        <div className="section-title-wrapper">
-          <h3 className="section-title">Painting Tools</h3>
+        <div className="section-title-wrapper" title="Draw walls, start, goal, or erase">
+          <h3 className="section-title">Tools</h3>
         </div>
         <div className="section-content">
           {['wall', 'erase', 'start', 'goal'].map(m => (
@@ -25,10 +25,10 @@ export default function Navbar({
               className={`nav-btn ${mode === m ? 'active' : ''}`}
               onClick={() => setMode(m)}
               title={
-                m === 'wall' ? 'Draw walls' :
-                m === 'erase' ? 'Erase cells' :
-                m === 'start' ? 'Set start node' :
-                'Set goal node'
+                m === 'wall' ? 'Draw impassable walls' :
+                m === 'erase' ? 'Erase any cell' :
+                m === 'start' ? 'Place start node' :
+                'Place goal node'
               }
             >
               {m.charAt(0).toUpperCase() + m.slice(1)}
@@ -37,10 +37,10 @@ export default function Navbar({
         </div>
       </div>
 
-      {/* WEIGHTED BRUSH */}
+      {/* WEIGHTS */}
       <div className="nav-section">
-        <div className="section-title-wrapper">
-          <h3 className="section-title">Weighted Brush</h3>
+        <div className="section-title-wrapper" title="Paint cell cost (affects pathfinding)">
+          <h3 className="section-title">Weights</h3>
         </div>
         <div className="section-content">
           {weights.map(w => (
@@ -48,7 +48,7 @@ export default function Navbar({
               key={w}
               className={`weight-btn ${mode === `weight-${w}` ? 'active' : ''}`}
               onClick={() => setMode(`weight-${w}`)}
-              title={`Paint weight ${w}${w === 1 ? ' (default path)' : ''}`}
+              title={`Movement cost: ${w}`}
             >
               {w === 1 ? 'Path' : w}
             </button>
@@ -56,30 +56,40 @@ export default function Navbar({
         </div>
       </div>
 
-      {/* OPTIONS */}
+      {/* SETTINGS */}
       <div className="nav-section">
-        <div className="section-title-wrapper">
-          <h3 className="section-title">Options</h3>
+        <div className="section-title-wrapper" title="Algorithm, speed, and display options">
+          <h3 className="section-title">Settings</h3>
         </div>
         <div className="section-content">
-          <select value={algorithm} onChange={e => setAlgorithm(e.target.value)} className="algo-select" title="Choose pathfinding algorithm">
-            <option value="dijkstra">Dijkstra</option>
-            <option value="astar">A*</option>
-            <option value="dfs">DFS</option>
+          <select
+            value={algorithm}
+            onChange={e => setAlgorithm(e.target.value)}
+            className="algo-select"
+            title="Select pathfinding algorithm"
+          >
+            <optgroup label="Unweighted">
+              <option value="bfs">BFS</option>
+              <option value="bidirectional">Bidirectional BFS</option>
+            </optgroup>
+            <optgroup label="Weighted">
+              <option value="dijkstra">Dijkstra</option>
+              <option value="astar">A*</option>
+              <option value="dfs">DFS (exploration)</option>
+            </optgroup>
           </select>
 
-          <label className="speed-label" title="Animation speed in milliseconds">
-            Speed:
-            <input type="range" min="1" max="100" value={speed} onChange={e => setSpeed(+e.target.value)} />
+          <label className="speed-label" title="Animation speed">
+            Speed: <input type="range" min="1" max="100" value={speed} onChange={e => setSpeed(+e.target.value)} />
             <span>{speed}ms</span>
           </label>
 
-          <label className="animate-label" title="Animate maze generation">
+          <label className="animate-label" title="Show maze generation steps">
             <input type="checkbox" checked={animateMaze} onChange={e => setAnimateMaze(e.target.checked)} />
-            Animate Maze
+            Animate Maze Generation
           </label>
 
-          <label className="darkmode-label" title="Toggle dark mode">
+          <label className="darkmode-label" title="Toggle dark theme">
             <input type="checkbox" checked={darkMode} onChange={e => setDarkMode(e.target.checked)} />
             Dark Mode
           </label>
@@ -88,13 +98,13 @@ export default function Navbar({
 
       {/* CONTROLS */}
       <div className="nav-section">
-        <div className="section-title-wrapper">
+        <div className="section-title-wrapper" title="Run, reset, or generate maze">
           <h3 className="section-title">Controls</h3>
         </div>
         <div className="section-content">
-          <button className="maze-btn" onClick={onGenerateMaze} title="Generate random maze">Generate Maze</button>
-          <button className="clear-btn" onClick={onClear} title="Clear all nodes and paths">Clear</button>
-          <button className="run-btn" onClick={onRun} title="Run selected algorithm">Run</button>
+          <button className="run-btn" onClick={onRun} title="Start algorithm">Run</button>
+          <button className="clear-btn" onClick={onClear} title="Clear grid">Clear</button>
+          <button className="maze-btn" onClick={onGenerateMaze} title="Generate random maze">Generate Random Maze</button>
         </div>
       </div>
     </nav>

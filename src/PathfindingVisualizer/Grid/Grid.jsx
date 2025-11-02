@@ -1,9 +1,11 @@
-// Grid.jsx
+// src/PathfindingVisualizer/Grid/Grid.jsx
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import Cell from '../Cell/Cell.jsx';
 import { dijkstra } from '../../Algorithms/Dijkstra';
 import { astar } from '../../Algorithms/Astar';
+import { bfs } from '../../Algorithms/BFS';
 import { dfs } from '../../Algorithms/DFS.js';
+import { bidirectional } from '../../Algorithms/BidirectionalBFS';
 import './Grid.css';
 
 const DEBOUNCE_MS = 50;
@@ -26,6 +28,7 @@ export default function Grid({ mode, algorithm, speed }) {
   const [goalCell, setGoalCell] = useState(null);
 
   const [visitedCells, setVisitedCells] = useState(new Set());
+  const [bidirectionalVisited, setBidirectionalVisited] = useState(new Set()); // ← NEW
   const [pathCells, setPathCells] = useState(new Set());
   const [currentCell, setCurrentCell] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -89,7 +92,10 @@ export default function Grid({ mode, algorithm, speed }) {
     const up = () => { isDragging.current = false; };
     window.addEventListener('mouseup', up);
     window.addEventListener('touchend', up);
-    return () => { window.removeEventListener('mouseup', up); window.removeEventListener('touchend', up); };
+    return () => {
+      window.removeEventListener('mouseup', up);
+      window.removeEventListener('touchend', up);
+    };
   }, []);
 
   const handleCellClick = useCallback((e) => {
@@ -130,6 +136,7 @@ export default function Grid({ mode, algorithm, speed }) {
     if (!startCell || !goalCell || isRunning) return;
     setIsRunning(true);
     setVisitedCells(new Set());
+    setBidirectionalVisited(new Set()); // ← Reset bidirectional
     setPathCells(new Set());
     setCurrentCell(null);
     setNoPath(false);
@@ -144,7 +151,7 @@ export default function Grid({ mode, algorithm, speed }) {
     const [sr, sc] = startCell.split('-').map(Number);
     const [gr, gc] = goalCell.split('-').map(Number);
 
-    const algoFn = { dijkstra, astar, dfs }[algorithm];
+    const algoFn = { dijkstra, astar, bfs, dfs, bidirectional }[algorithm];
     const { visitedInOrder, path } = algoFn(grid, { row: sr, col: sc }, { row: gr, col: gc });
 
     let i = 0;
@@ -152,13 +159,17 @@ export default function Grid({ mode, algorithm, speed }) {
       if (i >= visitedInOrder.length) {
         clearInterval(intervalRef.current);
         setCurrentCell(null);
+
         if (path.length > 0) {
           let j = 0;
           const pathInt = setInterval(() => {
-            if (j >= path.length) { clearInterval(pathInt); setIsRunning(false); return; }
+            if (j >= path.length) {
+              clearInterval(pathInt);
+              setIsRunning(false);
+              return;
+            }
             const cell = path[j];
             const id = `${cell.row}-${cell.col}`;
-            const cellWeight = grid[cell.row][cell.col].weight;
             setPathCells(prev => new Set(prev).add(id));
             j++;
           }, speed);
@@ -170,13 +181,16 @@ export default function Grid({ mode, algorithm, speed }) {
       }
 
       const cell = visitedInOrder[i];
-     
       const id = `${cell.row}-${cell.col}`;
-      const cellWeight = grid[cell.row][cell.col].weight;
-      const visitDelay = speed * 0.7 * cellWeight;
+      const isBidirectional = algorithm === 'bidirectional';
+
+      if (isBidirectional) {
+        setBidirectionalVisited(prev => new Set(prev).add(`${id}:${cell.side}`));
+      } else {
+        setVisitedCells(prev => new Set(prev).add(id));
+      }
 
       setCurrentCell(id);
-      setTimeout(() => setVisitedCells(prev => new Set(prev).add(id)), visitDelay);
       i++;
     }, speed);
   }, [rows, cols, startCell, goalCell, wallCells, weightCells, algorithm, speed, isRunning]);
@@ -185,6 +199,7 @@ export default function Grid({ mode, algorithm, speed }) {
     if (intervalRef.current) clearInterval(intervalRef.current);
     setIsRunning(false);
     setVisitedCells(new Set());
+    setBidirectionalVisited(new Set());
     setPathCells(new Set());
     setCurrentCell(null);
     setNoPath(false);
@@ -305,6 +320,20 @@ export default function Grid({ mode, algorithm, speed }) {
       for (let c = 0; c < cols; c++) {
         const id = `${r}-${c}`;
         const weight = weightCells.get(id);
+
+        let isVisited = null;
+        if (algorithm === 'bidirectional') {
+          for (const entry of bidirectionalVisited) {
+            const [vid, side] = entry.split(':');
+            if (vid === id) {
+              isVisited = entry;
+              break;
+            }
+          }
+        } else if (visitedCells.has(id)) {
+          isVisited = id;
+        }
+
         arr.push(
           <Cell
             key={id}
@@ -313,7 +342,7 @@ export default function Grid({ mode, algorithm, speed }) {
             weight={weight}
             isStart={startCell === id}
             isGoal={goalCell === id}
-            isVisited={visitedCells.has(id)}
+            isVisited={isVisited}
             isPath={pathCells.has(id)}
             isCurrent={currentCell === id}
             onActivate={handleCellClick}
@@ -322,7 +351,11 @@ export default function Grid({ mode, algorithm, speed }) {
       }
     }
     return arr;
-  }, [rows, cols, wallCells, weightCells, startCell, goalCell, visitedCells, pathCells, currentCell, handleCellClick]);
+  }, [
+    rows, cols, wallCells, weightCells, startCell, goalCell,
+    visitedCells, pathCells, currentCell, handleCellClick,
+    algorithm, bidirectionalVisited
+  ]);
 
   return (
     <div ref={wrapperRef} className="grid-wrapper">
