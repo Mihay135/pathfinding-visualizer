@@ -1,8 +1,8 @@
 /* styles/Navbar.css */
 .navbar {
-  height: 70px;
+  height: 80px;
   min-height: 70px;
-  background: #2c3e50;
+  background: #34495e;
   display: flex;
   align-items: center;
   padding: 0 16px;
@@ -21,34 +21,88 @@
   flex-direction: column;
   align-items: center;
 }
+/* styles/Navbar.css */
 
-/* SECTION TITLE – CUTS THROUGH BORDER */
-.section-title {
+/* SECTION WRAPPER */
+.nav-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* TITLE WRAPPER – CREATES ROUNDED CUT */
+.section-title-wrapper {
   position: absolute;
-  top: 0;
+  top: -30%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  background: #2c3e50;
-  padding: 0 12px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #ecf0f1;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  z-index: 2;
+  transform: translateX(-50%);
+  z-index: 10;
   pointer-events: none;
 }
 
-/* SECTION CONTENT – BOX WITH BORDER */
+/* TITLE – INSIDE ROUNDED CUT */
+.section-title {
+  background: #34495e;
+  color: #ecf0f1;
+  padding: 4px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  border-radius: 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* SECTION CONTENT – BORDER WITH ROUNDED NOTCH */
 .section-content {
   display: flex;
   gap: 8px;
-  padding: 16px 12px 12px;
+  padding: 18px 12px 12px;
   border: 2px solid #1a2530;
-  border-radius: 12px;
+  border-radius: 14px;
   background: #34495e;
   min-width: fit-content;
   align-items: center;
+  position: relative;
+  margin-top: 5px;
+}
+
+/* ROUNDED NOTCH – COVERS BORDER UNDER TITLE */
+.section-content::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70px;
+  height: 24px;
+  background: #34495e;
+  border-radius: 12px;
+  z-index: 5;
+}
+
+/* FINE-TUNE WIDTH PER TITLE */
+.section-title-wrapper:has(h3:contains("Painting Tools")) + .section-content::before { width: 110px; }
+.section-title-wrapper:has(h3:contains("Weighted Brush")) + .section-content::before { width: 120px; }
+.section-title-wrapper:has(h3:contains("Options")) + .section-content::before { width: 80px; }
+.section-title-wrapper:has(h3:contains("Controls")) + .section-content::before { width: 80px; }
+
+/* DARK MODE */
+body.dark-mode .section-title {
+  background: #2c3e50;
+  color: #bdc3c7;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+body.dark-mode .section-content {
+  background: #2c3e50;
+  border-color: #000;
+}
+
+body.dark-mode .section-content::before {
+  background: #2c3e50;
 }
 
 /* BUTTONS */

@@ -15,7 +15,9 @@ export default function Navbar({
     <nav className="navbar">
       {/* PAINTING TOOLS */}
       <div className="nav-section">
-        <h3 className="section-title">Painting Tools</h3>
+        <div className='section-title-wrapper'>
+          <h3 className="section-title">Painting Tools</h3>
+        </div>
         <div className="section-content">
           {['wall', 'erase', 'start', 'goal'].map(m => (
             <button
@@ -31,7 +33,9 @@ export default function Navbar({
 
       {/* WEIGHTED BRUSH */}
       <div className="nav-section">
-        <h3 className="section-title">Weighted Brush</h3>
+        <div className='section-title-wrapper'>
+          <h3 className="section-title">Weighted Brush</h3>
+        </div>
         <div className="section-content">
           {weights.map(w => (
             <button
@@ -47,7 +51,10 @@ export default function Navbar({
 
       {/* OPTIONS */}
       <div className="nav-section">
-        <h3 className="section-title">Options</h3>
+        <div className='section-title-wrapper'>
+          <h3 className="section-title">Options</h3>
+        </div>
+        
         <div className="section-content">
           <select value={algorithm} onChange={e => setAlgorithm(e.target.value)} className="algo-select">
             <option value="dijkstra">Dijkstra</option>
@@ -75,7 +82,10 @@ export default function Navbar({
 
       {/* CONTROLS */}
       <div className="nav-section">
-        <h3 className="section-title">Controls</h3>
+        <div className='section-title-wrapper'>
+          <h3 className="section-title">Controls</h3>
+        </div>
+        
         <div className="section-content">
           <button className="maze-btn" onClick={onGenerateMaze}>Generate Maze</button>
           <button className="clear-btn" onClick={onClear}>Clear</button>
