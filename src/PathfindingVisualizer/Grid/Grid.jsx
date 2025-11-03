@@ -11,6 +11,7 @@ import './Grid.css';
 const DEBOUNCE_MS = 40;
 
 export default function Grid({ mode, algorithm, speed }) {
+  //Initial setup
   const wrapperRef = useRef(null);
   const containerRef = useRef(null);
   const rafRef = useRef(null);
@@ -31,7 +32,7 @@ export default function Grid({ mode, algorithm, speed }) {
   const [bidirectionalVisited, setBidirectionalVisited] = useState(new Set());
   const [pathCells, setPathCells] = useState(new Set());
   const [currentCell, setCurrentCell] = useState(null);
-  const [isRunning, setIsRunning] = useState(false);
+  const [isAnimationRunning, setIsAnimationRunning] = useState(false);
   const [noPath, setNoPath] = useState(false);
 
   //Initial css values cached
@@ -86,7 +87,7 @@ export default function Grid({ mode, algorithm, speed }) {
     }, DEBOUNCE_MS);
   }, [calculate, css.gap]);
 
-
+  //Resize Observer on screen resize
   useEffect(() => {
     scheduleUpdate();
     const ro = new ResizeObserver(scheduleUpdate);
@@ -94,6 +95,7 @@ export default function Grid({ mode, algorithm, speed }) {
     return () => ro.disconnect();
   }, [scheduleUpdate]);
 
+  //Enable Click-and-drag to draw on the grid
   const isDragging = useRef(false);
   useEffect(() => {
     const up = () => { isDragging.current = false; };
@@ -105,8 +107,9 @@ export default function Grid({ mode, algorithm, speed }) {
     };
   }, []);
 
+  //Handle Cell type placing on click or drag
   const handleCellClick = useCallback((e) => {
-    if (isRunning) return;
+    if (isAnimationRunning) return;
     const id = e.currentTarget.dataset.id;
     if (!id) return;
     if (e.type === 'mousedown' || e.type === 'touchstart') isDragging.current = true;
@@ -137,17 +140,21 @@ export default function Grid({ mode, algorithm, speed }) {
       setWallCells(prev => { const n = new Set(prev); n.delete(id); return n; });
       setWeightCells(prev => { const n = new Map(prev); n.delete(id); return n; });
     }
-  }, [mode, isRunning, startCell, goalCell]);
+  }, [mode, isAnimationRunning, startCell, goalCell]);
 
+  //Run the animation of the algorithm
   const run = useCallback(() => {
-    if (!startCell || !goalCell || isRunning) return;
-    setIsRunning(true);
+    //don't play animation if there's no start or goal cell of if the animation is running
+    if (!startCell || !goalCell || isAnimationRunning) return;
+    //prepare for new animation
+    setIsAnimationRunning(true);
     setVisitedCells(new Set());
-    setBidirectionalVisited(new Set()); // ← Reset bidirectional
+    setBidirectionalVisited(new Set());
     setPathCells(new Set());
     setCurrentCell(null);
     setNoPath(false);
-
+    
+    //Prepare array by converting the UI state into an 2d array of cells with walls and weighted cells
     const grid = Array.from({ length: rows }, (_, r) =>
       Array.from({ length: cols }, (_, c) => {
         const id = `${r}-${c}`;
@@ -155,24 +162,30 @@ export default function Grid({ mode, algorithm, speed }) {
       })
     );
 
+    //get rows and cols of start and goal cells
     const [sr, sc] = startCell.split('-').map(Number);
     const [gr, gc] = goalCell.split('-').map(Number);
 
+    //Get the chosen algorithm and run it once to get order visit and shortest path
     const algoFn = { dijkstra, astar, bfs, dfs, bidirectional }[algorithm];
     const { visitedInOrder, path } = algoFn(grid, { row: sr, col: sc }, { row: gr, col: gc });
 
+    //Animation start
     let i = 0;
     intervalRef.current = setInterval(() => {
+
+      //Animate visited cells
       if (i >= visitedInOrder.length) {
         clearInterval(intervalRef.current);
         setCurrentCell(null);
 
+        //Animate path cells to goal if it is found
         if (path.length > 0) {
           let j = 0;
           const pathInt = setInterval(() => {
             if (j >= path.length) {
               clearInterval(pathInt);
-              setIsRunning(false);
+              setIsAnimationRunning(false);
               return;
             }
             const cell = path[j];
@@ -181,16 +194,18 @@ export default function Grid({ mode, algorithm, speed }) {
             j++;
           }, speed);
         } else {
-          setNoPath(true);
-          setIsRunning(false);
+          setNoPath(true); //Show no path overlay
+          setIsAnimationRunning(false);
         }
         return;
       }
 
+      //Highlight current cell being explored (core animation step)
       const cell = visitedInOrder[i];
       const id = `${cell.row}-${cell.col}`;
       const isBidirectional = algorithm === 'bidirectional';
 
+      //For bidirectional we need to keep track if the animated cell is from the start or goal side
       if (isBidirectional) {
         setBidirectionalVisited(prev => new Set(prev).add(`${id}:${cell.side}`));
       } else {
@@ -200,11 +215,12 @@ export default function Grid({ mode, algorithm, speed }) {
       setCurrentCell(id);
       i++;
     }, speed);
-  }, [rows, cols, startCell, goalCell, wallCells, weightCells, algorithm, speed, isRunning]);
+  }, [rows, cols, startCell, goalCell, wallCells, weightCells, algorithm, speed, isAnimationRunning]);
 
+  //Clear the grid cells and animation if it is running
   const clear = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    setIsRunning(false);
+    setIsAnimationRunning(false);
     setVisitedCells(new Set());
     setBidirectionalVisited(new Set());
     setPathCells(new Set());
@@ -216,15 +232,18 @@ export default function Grid({ mode, algorithm, speed }) {
     setGoalCell(null);
   }, []);
 
+  //Generate a random maze with or without animation
   const generateMaze = useCallback((e) => {
-    const animate = e.detail?.animate ?? true;
-    if (isRunning || rows < 5 || cols < 5) return;
-    clear();
+    const animate = e.detail?.animate ?? true; //checks if maze generation animation is checked (it is by default) 
+    if (isAnimationRunning || rows < 5 || cols < 5) return; //doesn't generate maze if the grid is very small
+    clear(); //resets grid if it had any elements placed
 
+    //considers wall cells only those of odd index
     const cellRows = Math.floor((rows + 1) / 2);
     const cellCols = Math.floor((cols + 1) / 2);
     if (cellRows < 3 || cellCols < 3) return;
 
+    //open cells every even row/col
     const passageCells = new Set();
     for (let r = 0; r < rows; r += 2) {
       for (let c = 0; c < cols; c += 2) {
@@ -232,6 +251,7 @@ export default function Grid({ mode, algorithm, speed }) {
       }
     }
 
+    //Prevent cycles in the maze by using Union-Find (DSU) with path compression and union by rank
     const parent = {}, rank = {};
     const find = (id) => parent[id] !== id ? (parent[id] = find(parent[id])) : id;
     const union = (a, b) => {
@@ -243,8 +263,10 @@ export default function Grid({ mode, algorithm, speed }) {
       return true;
     };
 
+    //initialize each passage cell as its own "set"
     for (const id of passageCells) { parent[id] = id; rank[id] = 0; }
 
+    //build a list of possible walls between adjacent passage cells only on right and down direction to avoid duplicates
     const walls = [];
     const dirs = [[0,1],[1,0]];
     for (let r = 0; r < cellRows; r++) {
@@ -264,12 +286,15 @@ export default function Grid({ mode, algorithm, speed }) {
       }
     }
 
+    //shuffle walls to get a random maze
     for (let i = walls.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [walls[i], walls[j]] = [walls[j], walls[i]];
     }
 
     const finalWalls = new Set();
+
+    //if animation is not selected build the maze instantly
     if (!animate) {
       for (const wall of walls) {
         if (find(wall.a) !== find(wall.b)) union(wall.a, wall.b);
@@ -283,6 +308,7 @@ export default function Grid({ mode, algorithm, speed }) {
       return;
     }
 
+    //Animate the maze generation build process
     let index = 0;
     const animateBuild = () => {
       if (index >= walls.length) {
@@ -302,8 +328,9 @@ export default function Grid({ mode, algorithm, speed }) {
     };
 
     animateBuild();
-  }, [rows, cols, isRunning, clear, speed]);
+  }, [rows, cols, isAnimationRunning, clear, speed]);
 
+  //Run, clear and Generate maze buttons event listeners 
   useEffect(() => {
     const runHandler = () => run();
     const clearHandler = () => clear();
@@ -320,9 +347,11 @@ export default function Grid({ mode, algorithm, speed }) {
     };
   }, [run, clear, generateMaze]);
 
+  //Cache the grid of cells to avoid re-rendering each animation frame
   const cells = useMemo(() => {
     if (!cols || !rows) return null;
     const arr = [];
+    //Loop on the cells of the grid
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const id = `${r}-${c}`;
@@ -341,6 +370,7 @@ export default function Grid({ mode, algorithm, speed }) {
           isVisited = id;
         }
 
+        //Create the cell with all the props needed
         arr.push(
           <Cell
             key={id}
@@ -358,12 +388,13 @@ export default function Grid({ mode, algorithm, speed }) {
       }
     }
     return arr;
-  }, [
+  }, [//Dependencies
     rows, cols, wallCells, weightCells, startCell, goalCell,
     visitedCells, pathCells, currentCell, handleCellClick,
     algorithm, bidirectionalVisited
   ]);
 
+  //Render grid and the no-path hidden overlay
   return (
     <div ref={wrapperRef} className="grid-wrapper">
       {noPath && (
@@ -391,6 +422,7 @@ export default function Grid({ mode, algorithm, speed }) {
   );
 }
 
+//Filter cells' IDs that are out of the screen
 function filterOutOfBounds(set, rows, cols) {
   const next = new Set();
   for (const id of set) {
@@ -400,6 +432,7 @@ function filterOutOfBounds(set, rows, cols) {
   return next;
 }
 
+//Checks if a cell is withind the boundries of the screen
 function isInBounds(id, rows, cols) {
   const [r, c] = id.split('-').map(Number);
   return r >= 0 && r < rows && c >= 0 && c < cols;
