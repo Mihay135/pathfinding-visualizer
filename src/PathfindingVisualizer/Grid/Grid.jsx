@@ -11,7 +11,7 @@ import './Grid.css';
 const DEBOUNCE_MS = 40;
 
 export default function Grid({ mode, algorithm, speed }) {
-  //Initial setup
+  //Initial setup and hooks
   const wrapperRef = useRef(null);
   const containerRef = useRef(null);
   const rafRef = useRef(null);
@@ -305,6 +305,19 @@ export default function Grid({ mode, algorithm, speed }) {
       finalWalls.delete('1-1'); finalWalls.delete(`${rows-2}-${cols-2}`);
       setWallCells(finalWalls);
       setStartCell('1-1'); setGoalCell(`${rows-2}-${cols-2}`);
+
+      const weightOptions = [5, 10, 20];
+      const weightChance = 0.45; // 15% of passage cells get weight
+      const newWeightCells = new Map();
+
+      for (const passageId of passageCells) {
+        if (Math.random() < weightChance) {
+          const weight = weightOptions[Math.floor(Math.random() * weightOptions.length)];
+          newWeightCells.set(passageId, weight);
+        }
+      }
+
+      setWeightCells(newWeightCells);
       return;
     }
 

@@ -2,6 +2,7 @@
 import { memo } from 'react';
 import './Cell.css';
 
+//Memo for cell caching
 export default memo(function Cell({ 
   id, 
   isWall, 
@@ -13,6 +14,7 @@ export default memo(function Cell({
   isCurrent, 
   onActivate 
 }) {
+
   // isVisited is either: "id" or "id:side" (for bidirectional)
   let visitedId = null;
   let side = null;
@@ -25,9 +27,11 @@ export default memo(function Cell({
     }
   }
 
+  //Check if it's a cell the start side of goal side for the bidirectional algorithm
   const isStartSide = side === 'start';
   const isGoalSide = side === 'goal';
 
+  //Render the cell with weight inside if 
   return (
     <div
       className={`
@@ -48,7 +52,7 @@ export default memo(function Cell({
       onTouchStart={onActivate}
       onTouchMove={onActivate}
     >
-      {weight > 1 && weight}
+      {weight >= 1 && weight}
     </div>
   );
 });

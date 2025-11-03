@@ -1,4 +1,4 @@
-/* styles/Grid.css */
+/* Grid.css */
 .grid-wrapper {
   --pad: 12px;
   --gap: 4px;
@@ -53,7 +53,11 @@
   max-width: 280px;
 }
 
-.no-path-title { font-size: 1.3rem; opacity: 0.9; }
+.no-path-title {
+  font-size: 1.3rem;
+  opacity: 0.9;
+}
+
 .no-path-close {
   background: #e74c3c;
   color: white;
@@ -65,7 +69,10 @@
   font-size: 0.9rem;
   transition: background 0.2s;
 }
-.no-path-close:hover { background: #c0392b; }
+
+.no-path-close:hover {
+  background: #c0392b;
+}
 
 @keyframes popIn {
   0% { transform: scale(0.8); opacity: 0; }
@@ -73,7 +80,20 @@
 }
 
 /* Dark mode */
-body.dark-mode .no-path-overlay { background: rgba(26, 26, 26, 0.95); }
-body.dark-mode .no-path-message { background: #2c3e50; border: 1px solid #1a1a1a; color: #bdc3c7; }
-body.dark-mode .no-path-close { background: #c0392b; }
-body.dark-mode .no-path-close:hover { background: #a93226; }
+body.dark-mode .no-path-overlay {
+  background: rgba(26, 26, 26, 0.95);
+}
+
+body.dark-mode .no-path-message {
+  background: #2c3e50;
+  border: 1px solid #1a1a1a;
+  color: #bdc3c7;
+}
+
+body.dark-mode .no-path-close {
+   background: #c0392b;
+}
+
+body.dark-mode .no-path-close:hover {
+  background: #a93226;
+}
