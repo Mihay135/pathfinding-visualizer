@@ -8,7 +8,7 @@ import { dfs } from '../../Algorithms/DFS.js';
 import { bidirectional } from '../../Algorithms/BidirectionalBFS';
 import './Grid.css';
 
-const DEBOUNCE_MS = 50;
+const DEBOUNCE_MS = 40;
 
 export default function Grid({ mode, algorithm, speed }) {
   const wrapperRef = useRef(null);
@@ -28,12 +28,13 @@ export default function Grid({ mode, algorithm, speed }) {
   const [goalCell, setGoalCell] = useState(null);
 
   const [visitedCells, setVisitedCells] = useState(new Set());
-  const [bidirectionalVisited, setBidirectionalVisited] = useState(new Set()); // ← NEW
+  const [bidirectionalVisited, setBidirectionalVisited] = useState(new Set());
   const [pathCells, setPathCells] = useState(new Set());
   const [currentCell, setCurrentCell] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [noPath, setNoPath] = useState(false);
 
+  //Initial css values cached
   const css = useMemo(() => {
     const s = getComputedStyle(document.documentElement);
     return {
@@ -45,6 +46,7 @@ export default function Grid({ mode, algorithm, speed }) {
     };
   }, []);
 
+  //Cache function to update number of cells and their css in the grid based on screen zoom size
   const calculate = useCallback(() => {
     if (!wrapperRef.current) return { cols: 0, rows: 0, size: css.min };
     const w = wrapperRef.current.clientWidth - css.pad * 2 - css.border * 2;
@@ -58,13 +60,17 @@ export default function Grid({ mode, algorithm, speed }) {
     return best;
   }, [css]);
 
+  //Grid resize and cells update scheduler
   const scheduleUpdate = useCallback(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = requestAnimationFrame(() => {
         const { cols, rows, size } = calculate();
-        setCols(cols); setRows(rows); setCellSize(size); setGap(css.gap);
+        setCols(cols);
+        setRows(rows);
+        setCellSize(size);
+        setGap(css.gap);
         setWallCells(prev => filterOutOfBounds(prev, rows, cols));
         setWeightCells(prev => {
           const next = new Map();
@@ -79,6 +85,7 @@ export default function Grid({ mode, algorithm, speed }) {
       });
     }, DEBOUNCE_MS);
   }, [calculate, css.gap]);
+
 
   useEffect(() => {
     scheduleUpdate();
@@ -211,7 +218,7 @@ export default function Grid({ mode, algorithm, speed }) {
 
   const generateMaze = useCallback((e) => {
     const animate = e.detail?.animate ?? true;
-    if (isRunning || rows < 7 || cols < 7) return;
+    if (isRunning || rows < 5 || cols < 5) return;
     clear();
 
     const cellRows = Math.floor((rows + 1) / 2);

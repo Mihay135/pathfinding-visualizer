@@ -9,22 +9,77 @@
   border-bottom: 2px solid #1a2530;
   user-select: none;
   flex-shrink: 0;
-  gap: 20px;
+  gap: 8px;
   overflow-x: auto;
   white-space: nowrap;
 }
 
 /* Mobile Responsive */
-@media (max-width: 768px) {
+  @media (max-width: 900px) {
   .navbar {
     flex-wrap: wrap;
     height: auto;
-    padding: 10px;
-    gap: 10px;
+    padding: 12px 8px;
+    gap: 8px;
+    overflow-x: visible;
+    white-space: normal;
   }
-  .nav-section { flex-basis: 100%; }
-  .section-content { justify-content: center; }
+
+  .nav-section {
+    flex: 1 1 140px; /* Grow, but min 140px */
+    min-width: 120px;
+    max-width: 180px;
+  }
+
+  .section-content {
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 8px 12px !important;
+    gap: 8px !important;
+  }
+
+  .section-title-wrapper {
+    top: -28px !important;
+  }
+
+  .section-title {
+    font-size: 0.75rem !important;
+    padding: 3px 10px !important;
+    
+  }
+
+  .nav-btn, .weight-btn, .algo-select, .maze-btn, .clear-btn, .run-btn {
+    padding: 6px 8px !important;
+    font-size: 0.75rem !important;
+    min-width: 36px !important;
+  }
+
+  .algo-select {
+    width: 100% !important;
+    max-width: 100px;
+  }
+
+  .speed-label, .animate-label, .darkmode-label {
+    flex-direction: column;
+    font-size: 0.75rem;
+    gap: 4px;
+  }
+
+  .darkmode-label, .animate-label{
+    border: 1px solid black;
+    border-radius: 4px;
+    padding: 4px;
+  }
+
+  .speed-label input {
+    width: 70px !important;
+  }
+
+  .speed-label span {
+    font-size: 0.7rem;
+  }
 }
+
 
 /* SECTION STYLES */
 .nav-section {
@@ -46,7 +101,7 @@
 
 .section-title {
   background: #34495e;
-  color: #ecf0f1;
+  color: #f9feff;
   padding: 4px 14px;
   font-size: 0.8rem;
   font-weight: 700;
@@ -55,6 +110,7 @@
   border-radius: 12px;
   white-space: nowrap;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  filter: brightness(1.15) drop-shadow(0px 2px 4px hsla(240, 14%, 25%, 0.70));
 }
 
 .section-title-wrapper::after {
@@ -64,7 +120,7 @@
   left: 50%;
   transform: translateX(-50%);
   background: #2c3e50;
-  color: #ecf0f1;
+  color: #edfbff;
   padding: 6px 10px;
   border-radius: 6px;
   font-size: 0.8rem;
@@ -113,10 +169,18 @@ body.dark-mode .section-title-wrapper::after {
   z-index: 5;
 }
 
-.section-title-wrapper:has(h3:contains("Painting Tools")) + .section-content::before { width: 110px; }
-.section-title-wrapper:has(h3:contains("Weighted Brush")) + .section-content::before { width: 120px; }
-.section-title-wrapper:has(h3:contains("Options")) + .section-content::before { width: 80px; }
-.section-title-wrapper:has(h3:contains("Controls")) + .section-content::before { width: 80px; }
+.section-title-wrapper:has(h3:contains("Painting Tools")) + .section-content::before {
+  width: 110px;
+}
+.section-title-wrapper:has(h3:contains("Weighted Brush")) + .section-content::before {
+  width: 120px;
+}
+.section-title-wrapper:has(h3:contains("Options")) + .section-content::before {
+  width: 80px;
+}
+.section-title-wrapper:has(h3:contains("Controls")) + .section-content::before {
+  width: 80px;
+}
 
 /* BUTTONS */
 .nav-btn, .weight-btn, .algo-select, .maze-btn, .clear-btn, .run-btn {
@@ -127,7 +191,7 @@ body.dark-mode .section-title-wrapper::after {
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.7rem;
   min-width: 40px;
 }
 
@@ -136,44 +200,108 @@ body.dark-mode .section-title-wrapper::after {
   box-shadow: 0 0 8px rgba(230, 126, 34, 0.6);
 }
 
-.weight-btn:nth-child(1) { background: #27ae60; }
-.weight-btn:nth-child(2) { background: #f39c12; }
-.weight-btn:nth-child(3) { background: #e67e22; }
-.weight-btn:nth-child(4) { background: #c0392b; }
+.weight-btn:nth-child(1) {
+  background: #27ae60;
+}
+.weight-btn:nth-child(2) {
+  background: #f39c12;
+}
+.weight-btn:nth-child(3) {
+  background: #e67e22;
+}
+.weight-btn:nth-child(4) {
+  background: #c0392b;
+}
 
-.maze-btn { background: #9b59b6; }
-.maze-btn:hover { background: #8e44ad; }
-.clear-btn { background: #e74c3c; }
-.clear-btn:hover { background: #c0392b; }
-.run-btn { background: #27ae60; }
-.run-btn:hover { background: #2ecc71; }
+.maze-btn {
+  background: #9b59b6;
+}
+.maze-btn:hover {
+  background: #8e44ad;
+}
+.clear-btn {
+  background: #e74c3c;
+}
+.clear-btn:hover {
+  background: #c0392b;
+}
+.run-btn {
+  background: #27ae60;
+}
+.run-btn:hover {
+  background: #2ecc71;
+}
 
-.algo-select { width: 100px; }
+.algo-select {
+  width: 100px; 
+}
 .speed-label, .animate-label, .darkmode-label {
   color: #ecf0f1;
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   display: flex;
   align-items: center;
   gap: 6px;
 }
-.speed-label input { width: 80px; }
-.speed-label span { min-width: 40px; font-weight: bold; }
-.animate-label input, .darkmode-label input { cursor: pointer; }
+.speed-label input { 
+  width: 80px;
+}
+.speed-label span {
+  min-width: 40px;
+  font-weight: bold;
+}
+.animate-label input, .darkmode-label input {
+  cursor: pointer;
+}
+
+.darkmode-label, .animate-label{
+    border: 1px solid hsla(0, 0%, 25%, 0.50);
+    border-radius: 4px;
+    padding: 4px;
+  }
 
 /* DARK MODE */
-body.dark-mode .navbar { background: #1a1a1a; border-bottom: 2px solid #000; }
-body.dark-mode .section-title { background: #1a1a1a; color: #bdc3c7; }
-body.dark-mode .section-content { background: #2c3e50; border-color: #000; }
-body.dark-mode .section-content::before { background: #2c3e50; }
-body.dark-mode .nav-btn,
-body.dark-mode .weight-btn,
-body.dark-mode .algo-select,
-body.dark-mode .maze-btn,
-body.dark-mode .clear-btn,
-body.dark-mode .run-btn {
-  background: #34495e;
+body.dark-mode .navbar {
+  background: #1a1a1a;
+  border-bottom: 2px solid #000;
+}
+
+body.dark-mode .section-title {
+  background: #1a1a1a;
+  color: #bdc3c7;
+  filter: brightness(1.25) drop-shadow(0px 4px 4px hsla(240, 28%, 27%, 0.65));
+}
+
+body.dark-mode .section-content {
+  background: #2c3e50;
+  border-color: #000; 
+}
+
+body.dark-mode .section-content::before {
+  background: #2c3e50;
+}
+
+body.dark-mode .nav-btn{
+  background: #104a85;
   color: #ecf0f1;
 }
+
+body.dark-mode .algo-select{
+  background: #104a85;
+  color: #ecf0f1;
+}
+body.dark-mode .maze-btn{
+  background: #9b59b6;
+  color: #ecf0f1;
+}
+body.dark-mode .clear-btn{
+  background: #e74c3c;
+  color: #ecf0f1;
+}
+body.dark-mode .run-btn {
+  background: #27ae60;
+  color: #ecf0f1;
+}
+
 body.dark-mode .nav-btn.active,
 body.dark-mode .weight-btn.active {
   background: #e67e22 !important;
