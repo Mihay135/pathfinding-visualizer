@@ -198,6 +198,7 @@ body.dark-mode .section-title-wrapper::after {
 .nav-btn.active, .weight-btn.active {
   background: #e67e22 !important;
   box-shadow: 0 0 8px rgba(230, 126, 34, 0.6);
+  border: 1px solid #fc9a45;
 }
 
 .weight-btn:nth-child(1) {
@@ -285,6 +286,14 @@ body.dark-mode .nav-btn{
   color: #ecf0f1;
 }
 
+/* Dark mode override */
+body.dark-mode .nav-btn.active,
+body.dark-mode .weight-btn.active {
+  background: #1284ff !important;                    /* Blue for dark mode */
+  box-shadow: 0 0 8px rgba(18, 132, 255, 0.6); /* Matching blue glow */
+  border: 1px solid #4da6ff;               /* Lighter blue border */
+}
+
 body.dark-mode .algo-select{
   background: #104a85;
   color: #ecf0f1;
@@ -300,10 +309,5 @@ body.dark-mode .clear-btn{
 body.dark-mode .run-btn {
   background: #27ae60;
   color: #ecf0f1;
-}
-
-body.dark-mode .nav-btn.active,
-body.dark-mode .weight-btn.active {
-  background: #e67e22 !important;
 }
 
