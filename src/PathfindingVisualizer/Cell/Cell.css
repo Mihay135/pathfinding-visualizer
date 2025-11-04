@@ -13,7 +13,7 @@
 }
 
 body.dark-mode .cell {
-  border: 1px solid hsla(0, 0%, 20%, 0.9);
+  border: 1px solid hsla(0, 1%, 26%, 0.9);
   background-color: hsl(223, 20%, 20%);
   color: #ecf0f1;
 }
@@ -25,11 +25,30 @@ body.dark-mode .cell {
   --weight-color-20: #ff6b6b;
 }
 
-.cell:hover { filter: brightness(1.1); }
+.cell:hover {
+  filter: brightness(1.1);
+}
 
-.cell.wall { background-color: #c0392b !important; color: white; }
-.cell.start { background-color: #269454 !important; color: white; }
-.cell.goal { background-color: #f1c40f !important; color: #2c3e50; }
+.cell.wall {
+  background-color: #c0392b !important;
+  color: white;
+  border: 1px solid #b61806;
+  border-radius: 1px;
+}
+
+.cell.start { 
+  background-color: #269454 !important;
+  color: white;
+  border: 1px solid #07652e;
+  border-radius: 1px;
+}
+
+.cell.goal {
+  background-color: #f1c40f !important;
+  color: #2c3e50;
+  border: 1px solid #cba305;
+  border-radius: 1px;
+}
 
 /* Bidirectional Visited */
 .cell.visited-start {

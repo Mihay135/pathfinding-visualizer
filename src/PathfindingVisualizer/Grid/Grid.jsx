@@ -293,6 +293,13 @@ export default function Grid({ mode, algorithm, speed }) {
     }
 
     const finalWalls = new Set();
+    let ind = 0;
+    let weightIndex = 0;
+    let bordersAdded = false;
+    const newWeightCells = new Map();
+    const weightOptions = [5, 10, 20];
+    const openCells = [];
+
 
     //if animation is not selected build the maze instantly
     if (!animate) {
@@ -307,16 +314,17 @@ export default function Grid({ mode, algorithm, speed }) {
       setStartCell('1-1'); setGoalCell(`${rows-2}-${cols-2}`);
 
       const weightOptions = [5, 10, 20];
-      const weightChance = 0.45; // 15% of passage cells get weight
+      const weightChance = 0.20;
       const newWeightCells = new Map();
-
-      for (const passageId of passageCells) {
-        if (Math.random() < weightChance) {
-          const weight = weightOptions[Math.floor(Math.random() * weightOptions.length)];
-          newWeightCells.set(passageId, weight);
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const id = `${r}-${c}`;
+          if (finalWalls.has(id) || id === '1-1' || id === `${rows-2}-${cols-2}`) continue;
+          if (Math.random() < weightChance) {
+            newWeightCells.set(id, weightOptions[Math.floor(Math.random() * 3)]);
+          }
         }
       }
-
       setWeightCells(newWeightCells);
       return;
     }
@@ -324,20 +332,68 @@ export default function Grid({ mode, algorithm, speed }) {
     //Animate the maze generation build process
     let index = 0;
     const animateBuild = () => {
-      if (index >= walls.length) {
-        for (let r = 0; r < rows; r++) { finalWalls.add(`${r}-0`); finalWalls.add(`${r}-${cols-1}`); }
-        for (let c = 0; c < cols; c++) { finalWalls.add(`0-${c}`); finalWalls.add(`${rows-1}-${c}`); }
-        finalWalls.delete('1-1'); finalWalls.delete(`${rows-2}-${cols-2}`);
-        setWallCells(finalWalls);
-        setStartCell('1-1'); setGoalCell(`${rows-2}-${cols-2}`);
+      // PHASE 1: Build maze walls
+      if (ind < walls.length) {
+        const wall = walls[ind++];
+        if (find(wall.a) !== find(wall.b)) {
+          union(wall.a, wall.b);
+        } else {
+          finalWalls.add(wall.id);
+          setWallCells(new Set(finalWalls));
+        }
+        setTimeout(animateBuild, Math.max(1, speed / 3));
         return;
       }
 
-      const wall = walls[index++];
-      if (find(wall.a) !== find(wall.b)) union(wall.a, wall.b);
-      else { finalWalls.add(wall.id); setWallCells(new Set(finalWalls)); }
+      // PHASE 2: Add border + open start/goal + collect open cells
+      if (!bordersAdded) {
+        for (let r = 0; r < rows; r++) {
+          finalWalls.add(`${r}-0`);
+          finalWalls.add(`${r}-${cols-1}`);
+        }
+        for (let c = 0; c < cols; c++) {
+          finalWalls.add(`0-${c}`);
+          finalWalls.add(`${rows-1}-${c}`);
+        }
+        finalWalls.delete('1-1');
+        finalWalls.delete(`${rows-2}-${cols-2}`);
+        setWallCells(new Set(finalWalls));
+        setStartCell('1-1');
+        setGoalCell(`${rows-2}-${cols-2}`);
+        bordersAdded = true;
 
-      setTimeout(animateBuild, Math.max(1, speed / 3));
+        // Collect all open cells (not wall, not start, not goal)
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const id = `${r}-${c}`;
+            if (!finalWalls.has(id) && id !== '1-1' && id !== `${rows-2}-${cols-2}`) {
+              openCells.push(id);
+            }
+          }
+        }
+        // Shuffle for random weight placement
+        for (let i = openCells.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [openCells[i], openCells[j]] = [openCells[j], openCells[i]];
+        }
+
+        setTimeout(animateBuild, Math.max(1, speed / 3));
+        return;
+      }
+
+      // PHASE 3: Animate weights one by one
+      if (weightIndex < openCells.length) {
+        const id = openCells[weightIndex++];
+        if (Math.random() <= 0.25) { //chance to place weight
+          const weight = weightOptions[Math.floor(Math.random() * weightOptions.length)];
+          newWeightCells.set(id, weight);
+          setWeightCells(new Map(newWeightCells));
+        }
+        setTimeout(animateBuild, Math.max(1, speed / 5));
+        return;
+      }
+
+      return;
     };
 
     animateBuild();
