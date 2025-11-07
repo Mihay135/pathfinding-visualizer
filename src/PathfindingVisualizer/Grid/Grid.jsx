@@ -8,7 +8,7 @@ import { dfs } from '../../Algorithms/DFS.js';
 import { bidirectional } from '../../Algorithms/BidirectionalBFS';
 import './Grid.css';
 
-const DEBOUNCE_MS = 40;
+const DEBOUNCE_MS = 40; //For the resize scheduler
 
 export default function Grid({ mode, algorithm, speed }) {
   //Initial setup and hooks
@@ -34,6 +34,7 @@ export default function Grid({ mode, algorithm, speed }) {
   const [currentCell, setCurrentCell] = useState(null);
   const [isAnimationRunning, setIsAnimationRunning] = useState(false);
   const [noPath, setNoPath] = useState(false);
+  const [noTarget, setNoTarget] = useState(false);
 
   //Initial css values cached
   const css = useMemo(() => {
@@ -85,7 +86,7 @@ export default function Grid({ mode, algorithm, speed }) {
         if (goalCell && !isInBounds(goalCell, rows, cols)) setGoalCell(null);
       });
     }, DEBOUNCE_MS);
-  }, [calculate, css.gap]);
+  }, [calculate, css.gap, goalCell, startCell]);
 
   //Resize Observer on screen resize
   useEffect(() => {
@@ -144,8 +145,16 @@ export default function Grid({ mode, algorithm, speed }) {
 
   //Run the animation of the algorithm
   const run = useCallback(() => {
-    //don't play animation if there's no start or goal cell of if the animation is running
-    if (!startCell || !goalCell || isAnimationRunning) return;
+    //Show the overlay message if no Start and Goal nodes are placed
+    if (!startCell || !goalCell) {
+      setNoTarget(true);
+      setIsAnimationRunning(false);
+      return;
+    };
+    //don't play animation if the animation is running
+    if(isAnimationRunning) 
+      return;
+
     //prepare for new animation
     setIsAnimationRunning(true);
     setVisitedCells(new Set());
@@ -153,6 +162,7 @@ export default function Grid({ mode, algorithm, speed }) {
     setPathCells(new Set());
     setCurrentCell(null);
     setNoPath(false);
+    setNoTarget(false);
     
     //Prepare array by converting the UI state into an 2d array of cells with walls and weighted cells
     const grid = Array.from({ length: rows }, (_, r) =>
@@ -174,7 +184,7 @@ export default function Grid({ mode, algorithm, speed }) {
     let i = 0;
     intervalRef.current = setInterval(() => {
 
-      //Animate visited cells
+    //Animate visited cells
       if (i >= visitedInOrder.length) {
         clearInterval(intervalRef.current);
         setCurrentCell(null);
@@ -196,6 +206,7 @@ export default function Grid({ mode, algorithm, speed }) {
         } else {
           setNoPath(true); //Show no path overlay
           setIsAnimationRunning(false);
+          setNoTarget(false);
         }
         return;
       }
@@ -226,6 +237,7 @@ export default function Grid({ mode, algorithm, speed }) {
     setPathCells(new Set());
     setCurrentCell(null);
     setNoPath(false);
+    setNoTarget(false);
     setWallCells(new Set());
     setWeightCells(new Map());
     setStartCell(null);
@@ -264,7 +276,10 @@ export default function Grid({ mode, algorithm, speed }) {
     };
 
     //initialize each passage cell as its own "set"
-    for (const id of passageCells) { parent[id] = id; rank[id] = 0; }
+    for (const id of passageCells) {
+      parent[id] = id;
+      rank[id] = 0;
+    }
 
     //build a list of possible walls between adjacent passage cells only on right and down direction to avoid duplicates
     const walls = [];
@@ -330,7 +345,6 @@ export default function Grid({ mode, algorithm, speed }) {
     }
 
     //Animate the maze generation build process
-    let index = 0;
     const animateBuild = () => {
       // PHASE 1: Build maze walls
       if (ind < walls.length) {
@@ -429,7 +443,7 @@ export default function Grid({ mode, algorithm, speed }) {
         let isVisited = null;
         if (algorithm === 'bidirectional') {
           for (const entry of bidirectionalVisited) {
-            const [vid, side] = entry.split(':');
+            const [vid, _] = entry.split(':');
             if (vid === id) {
               isVisited = entry;
               break;
@@ -463,14 +477,32 @@ export default function Grid({ mode, algorithm, speed }) {
     algorithm, bidirectionalVisited
   ]);
 
-  //Render grid and the no-path hidden overlay
+  //Render grid and the "no-path found" hidden overlay
   return (
     <div ref={wrapperRef} className="grid-wrapper">
-      {noPath && (
-        <div className="no-path-overlay" onClick={() => setNoPath(false)}>
+      {(noPath || noTarget) && (
+        <div 
+          className="no-path-overlay" 
+          onClick={() => {
+            setNoPath(false);
+            setNoTarget(false);
+          }}
+        >
           <div className="no-path-message" onClick={e => e.stopPropagation()}>
-            <div className="no-path-title">No Path Found</div>
-            <button className="no-path-close" onClick={() => setNoPath(false)}>Close</button>
+            <div className="no-path-title">
+              {noPath 
+                ? "No Path Found" 
+                : "You must place 'Start' and 'Goal' cells to run the animation"}
+            </div>
+            <button 
+              className="no-path-close" 
+              onClick={() => {
+                setNoPath(false);
+                setNoTarget(false);
+              }}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}

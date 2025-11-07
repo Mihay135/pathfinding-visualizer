@@ -39,15 +39,15 @@ body.dark-mode .cell {
 .cell.start { 
   background-color: #269454 !important;
   color: white;
-  border: 1px solid #07652e;
-  border-radius: 1px;
+  border: 2px solid #07652e;
+  border-radius: 2px;
 }
 
 .cell.goal {
-  background-color: #f1c40f !important;
+  background-color: #ff6200 !important;
   color: #2c3e50;
-  border: 1px solid #cba305;
-  border-radius: 1px;
+  border: 2px solid #d55200;
+  border-radius: 2px;
 }
 
 /* Bidirectional Visited */
@@ -62,7 +62,7 @@ body.dark-mode .cell {
 
 /* Standard visited */
 .cell.visited { 
-  background-color: #a8e6cf !important; 
+  background-color: #29b783 !important; 
   animation: pop 0.3s ease-out;
 }
 

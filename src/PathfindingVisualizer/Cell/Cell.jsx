@@ -31,7 +31,7 @@ export default memo(function Cell({
   const isStartSide = side === 'start';
   const isGoalSide = side === 'goal';
 
-  //Render the cell with weight inside if 
+  //Render the cell with weight inside if it's weighted
   return (
     <div
       className={`
@@ -52,6 +52,8 @@ export default memo(function Cell({
       onTouchStart={onActivate}
       onTouchMove={onActivate}
     >
+      {isGoal && "Goal"}
+      {isStart && "Start"}
       {weight >= 1 && weight}
     </div>
   );

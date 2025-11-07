@@ -78,7 +78,8 @@
   .speed-label span {
     font-size: 0.7rem;
   }
-}
+  
+}/*End of mobile responsiveness*/
 
 
 /* SECTION STYLES */
@@ -135,12 +136,6 @@
 
 .section-title-wrapper:hover::after {
   opacity: 1;
-}
-
-/* Dark mode */
-body.dark-mode .section-title-wrapper::after {
-  background: #34495e;
-  color: #bdc3c7;
 }
 
 .section-content {
@@ -254,16 +249,21 @@ body.dark-mode .section-title-wrapper::after {
   cursor: pointer;
 }
 
-.darkmode-label, .animate-label{
-    border: 1px solid hsla(0, 0%, 25%, 0.50);
-    border-radius: 4px;
-    padding: 4px;
-  }
-
 /* DARK MODE */
 body.dark-mode .navbar {
   background: #1a1a1a;
   border-bottom: 2px solid #000;
+}
+
+body.dark-mode .section-title-wrapper::after {
+  background: #34495e;
+  color: #bdc3c7;
+}
+
+.darkmode-label, .animate-label{
+    border: 1px solid hsla(0, 0%, 25%, 0.50);
+    border-radius: 4px;
+    padding: 4px;
 }
 
 body.dark-mode .section-title {
@@ -286,7 +286,6 @@ body.dark-mode .nav-btn{
   color: #ecf0f1;
 }
 
-/* Dark mode override */
 body.dark-mode .nav-btn.active,
 body.dark-mode .weight-btn.active {
   background: #1284ff !important;                    /* Blue for dark mode */
