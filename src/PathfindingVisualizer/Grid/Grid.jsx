@@ -491,7 +491,7 @@ export default function Grid({ mode, algorithm, speed }) {
           <div className="no-path-message" onClick={e => e.stopPropagation()}>
             <div className="no-path-title">
               {noPath 
-                ? "No Path Found" 
+                ? "No Path Found, check if 'Start' or 'Goal' cells are blocked" 
                 : "You must place 'Start' and 'Goal' cells to run the animation"}
             </div>
             <button 
