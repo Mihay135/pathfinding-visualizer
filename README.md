@@ -2,8 +2,6 @@
 
 An interactive **pathfinding algorithm visualizer** built with **React** and **vanilla CSS**. <br/> Visualize how **Dijkstra, A\*, BFS, DFS, and Bidirectional BFS** explore a grid to find the shortest path from **Start** to **Goal**.
 
-
-
 # Features
 - **5 Algorithms**: Dijkstra, A\*, BFS, DFS, Bidirectional BFS
 - **Interactive Grid**: Click & drag to draw walls, weights, start, and goal
@@ -75,10 +73,10 @@ src/
 |   |-- Dijkstra.js
 ... (other irrelevant files public folder etc..)
 ```
----
 ## Setup & Run Locally (clone repo)
+
 ```bash
-git clone https://github.com/your-username/pathfinding-visualizer.git
+git clone https://github.com/mihay135/pathfinding-visualizer.git
 cd pathfinding-visualizer
 npm install
 npm start
