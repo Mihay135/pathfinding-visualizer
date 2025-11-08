@@ -1,9 +1,20 @@
-# Pathfinding Visualizer <a>https://Mihay135.github.io/pathfinding-visualizer</a>
+# Pathfinding Visualizer 📊<a>https://Mihay135.github.io/pathfinding-visualizer</a>
 
 An interactive **pathfinding algorithm visualizer** built with **React** and **vanilla CSS**. <br/> Visualize how **Dijkstra, A\*, BFS, DFS, and Bidirectional BFS** explore a grid to find the shortest path from **Start** to **Goal**.
 
+# Screenshots
+| **App Initial View** |
+|----------------|
+|![Initial View](public/initial_view.png) |
+| **Automatic Maze Generation** |
+| ![Generate Automatic Maze](public/maze_generation.png) | 
+| **Path Found Animation To Goal** |
+|![Path Found Animation](public/path_found.png)|
+| **Dark Mode Supported** |
+| ![Dark Mode View](public/dark_mode.png) |
+
 # Features ✨
-- **5 Algorithms**: Dijkstra, A\*, BFS, DFS, Bidirectional BFS
+- **5 Algorithms**: Dijkstra, A\*, BFS, DFS, Bidirectional BFS (choose from dropdown menu, Dijkstra's by default)
 - **Interactive Grid**: Click & drag to draw walls, weights, start, and goal
 - **Animated Maze Generation** (Kruskal’s Algorithm with Union-Find)
 - **Random Weights** (5, 10, 20) on open paths
