@@ -2,7 +2,7 @@
 
 An interactive **pathfinding algorithm visualizer** built with **React** and **vanilla CSS**. <br/> Visualize how **Dijkstra, A\*, BFS, DFS, and Bidirectional BFS** explore a grid to find the shortest path from **Start** to **Goal**.
 
-# Features
+# Features ✨
 - **5 Algorithms**: Dijkstra, A\*, BFS, DFS, Bidirectional BFS
 - **Interactive Grid**: Click & drag to draw walls, weights, start, and goal
 - **Animated Maze Generation** (Kruskal’s Algorithm with Union-Find)
@@ -15,7 +15,7 @@ An interactive **pathfinding algorithm visualizer** built with **React** and **v
 - **Smooth Animations** with speed control
 - **Clear & Run Buttons** 
 
-## Algorithms
+## Algorithms 🔲
 
 | Algorithm         | Guaranteed Shortest? | Handles Weights? | Notes |
 |-------------------|------------------------|------------------|-------|
@@ -25,7 +25,7 @@ An interactive **pathfinding algorithm visualizer** built with **React** and **v
 | **DFS**           | No                   | No             | May find long paths |
 | **Bidirectional BFS** | Yes                  | No            | Searches from both ends |
 
-## How to Use
+## How to Use 📖
 
 1. **Place Start** (green) and **Goal** (red) nodes
 2. **Draw walls** or **weights** (5, 10, 20)
@@ -37,15 +37,16 @@ An interactive **pathfinding algorithm visualizer** built with **React** and **v
 
 > **Tip**: Drag to draw continuously. Click once to place Start/Goal.
 
-## Tech Stack
+## Tech Stack 🛠️
 
 - **React** (functional components, hooks)
+- **Javascript** (Pathing Algorithms)
 - **CSS Grid** for responsive layout
 - **Union-Find (DSU)** for maze generation
 - **Custom Events** for button controls
 - **No external libraries**
 
-## Project Structure
+## Project Structure 🏠
 ```
 ... (build files, Node modules, git and package.json files)
 src/
@@ -81,3 +82,12 @@ cd pathfinding-visualizer
 npm install
 npm start
 ```
+
+## License 📜
+MIT License (LICENSE) – free to use, modify, and distribute. (for more complete information see the LICENSE file)
+
+Built with love ❤️ by Mihay135
+Star 🌟 the repo if you like it!
+
+
+
